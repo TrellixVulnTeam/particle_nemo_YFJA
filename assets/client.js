@@ -104,16 +104,10 @@ function ixMovementUpdate() {
   }
 }
 
-function ixLightcubeAnimation() {
-  let a = .01;
-  Box1.rotation.x += a;
-  Box1.rotation.y += a;
-}
-
 function update() {
   control();
   ixMovementUpdate();
-  ixLightcubeAnimation();
+  // ixLightcubeAnimation();
 }
 
 function render() {
@@ -127,41 +121,65 @@ renderer.setAnimationLoop( function () {
 
 } );
 
-let BoxGeometry1 = new THREE.BoxGeometry(1, 1, 1);
-let BoxMaterial1 = new THREE.MeshBasicMaterial({ color: "yellow", wireframe: false });
-let Box1 = new THREE.Mesh(BoxGeometry1, BoxMaterial1);
+import { VOXLoader, VOXMesh } from '../node_modules/three/examples/jsm/loaders/VOXLoader.js';
+const loader1 = new VOXLoader();
+loadVox('../resources/knight.vox');
+loadVox('../resources/monu10.vox');
+function loadVox(path) {
+  loader1.load( path, function ( chunks ) {
+    for ( let i = 0; i < chunks.length; i ++ ) {
+      const chunk = chunks[ i ];
+      const mesh = new VOXMesh( chunk );
+      mesh.scale.setScalar( 1 );
+      let boundingBox = new THREE.Box3().setFromObject(mesh);
+      let height = boundingBox.max.y-boundingBox.min.y;
+      mesh.position.y=height/2;
+      scene.add( mesh );
+    }
+  } );
+}
 
-Box1.position.y = 3;
-Box1.scale.x = Box1.scale.y = Box1.scale.z = .25;
-scene.add(Box1);
-
-let BoxGeometry2 = new THREE.BoxGeometry(1, 1, 1);
-let BoxMaterial2 = new THREE.MeshPhongMaterial({ color: "white", wireframe: false });
-let Box2 = new THREE.Mesh(BoxGeometry2, BoxMaterial2);
-
-Box2.position.y = .75;
-Box2.position.x = 0;
-Box2.receiveShadow = true;
-Box2.castShadow = true;
-
-scene.add(Box2);
-
-let PlaneGeometry1 = new THREE.PlaneGeometry(10, 10);
-let PlaneMaterial1 = new THREE.MeshPhongMaterial({ color: "white", wireframe: false });
-let Plane1 = new THREE.Mesh(PlaneGeometry1, PlaneMaterial1);
-
-Plane1.rotation.x -= Math.PI / 2;
-Plane1.scale.x = 3;
-Plane1.scale.y = 3;
-Plane1.receiveShadow = true;
-scene.add(Plane1);
-
-let light1 = new THREE.PointLight("white", .8);
-light1.position.set(0, 3, 0);
-light1.castShadow = true;
-light1.shadow.camera.near = 2.5;
-scene.add(light1);
-
-let light2 = new THREE.AmbientLight("white", .15);
-light2.position.set(10, 2, 0);
+let light2 = new THREE.AmbientLight("white", 0.35);
+light2.position.set(10, 200, 0);
 scene.add(light2);
+
+// let BoxGeometry1 = new THREE.BoxGeometry(1, 1, 1);
+// let BoxMaterial1 = new THREE.MeshBasicMaterial({ color: "yellow", wireframe: false });
+// let Box1 = new THREE.Mesh(BoxGeometry1, BoxMaterial1);
+
+// Box1.position.y = 3;
+// Box1.scale.x = Box1.scale.y = Box1.scale.z = .25;
+// scene.add(Box1);
+
+// let BoxGeometry2 = new THREE.BoxGeometry(1, 1, 1);
+// let BoxMaterial2 = new THREE.MeshPhongMaterial({ color: "white", wireframe: false });
+// let Box2 = new THREE.Mesh(BoxGeometry2, BoxMaterial2);
+
+// Box2.position.y = .75;
+// Box2.position.x = 0;
+// Box2.receiveShadow = true;
+// Box2.castShadow = true;
+
+// scene.add(Box2);
+
+// let PlaneGeometry1 = new THREE.PlaneGeometry(10, 10);
+// let PlaneMaterial1 = new THREE.MeshPhongMaterial({ color: "white", wireframe: false });
+// let Plane1 = new THREE.Mesh(PlaneGeometry1, PlaneMaterial1);
+
+// Plane1.rotation.x -= Math.PI / 2;
+// Plane1.scale.x = 3;
+// Plane1.scale.y = 3;
+// Plane1.receiveShadow = true;
+// scene.add(Plane1);
+
+// let light1 = new THREE.PointLight("white", .8);
+// light1.position.set(0, 3, 0);
+// light1.castShadow = true;
+// light1.shadow.camera.near = 2.5;
+// scene.add(light1);
+
+// function ixLightcubeAnimation() {
+//   let a = .01;
+//   Box1.rotation.x += a;
+//   Box1.rotation.y += a;
+// }

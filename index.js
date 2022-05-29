@@ -7,17 +7,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const cookieParser = require('cookie-parser');
 app.use(cookieParser()); 
 
-const url = require("url");
 const fs = require('fs');
 const { dirname } = require('path');
 const path  = require('path');
-const readline = require('readline');
 
 const port = 8000;
 
 let appDir = dirname(require.main.filename);
 let assetFolder = appDir.concat('/assets');
-let resourceFolder = appDir.concat('/resources');
 let threeFolder = appDir.concat('/node_modules/three')
 
 var walk = function(dir, done) {
@@ -62,36 +59,7 @@ walk(assetFolder, function(err, results) {
       }
     }
     newPath = newPath.slice(0, -1)
-    console.log(absolutePath + "\n" + newPath);
     app.get(newPath, (req, res) => {
-      console.log(absolutePath);
-      res.sendFile(absolutePath);
-    });
-  }
-
-});
-
-walk(resourceFolder, function(err, results) {
-  if (err) throw err;
-  
-  for (var i = 0; i < results.length; i++) {
-    let absolutePath = results[i];
-    let path = results[i].split("\\");
-    let foundNodeModules = false;
-    let newPath = "/";
-    for (var ii = 0; ii < path.length; ii++) {
-      let name = path[ii];
-      if(name=="resources") {
-        foundNodeModules = true;
-      }
-      if(foundNodeModules==true) {
-        newPath = newPath + name + "/";
-      }
-    }
-    newPath = newPath.slice(0, -1)
-    console.log(absolutePath + "\n" + newPath);
-    app.get(newPath, (req, res) => {
-      console.log(absolutePath);
       res.sendFile(absolutePath);
     });
   }
@@ -116,7 +84,6 @@ walk(threeFolder, function(err, results) {
       }
     }
     newPath = newPath.slice(0, -1)
-    console.log(absolutePath + "\n" + newPath);
     app.get(newPath, (req, res) => {
       console.log(absolutePath);
       res.sendFile(absolutePath);

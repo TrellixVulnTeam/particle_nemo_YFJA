@@ -39,7 +39,7 @@ camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
 const loader = new THREE.TextureLoader();
 const texture = loader.load(
-  '../resources/skybox.jpg',
+  '../assets/img/skybox.jpg',
   () => {
     const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
     rt.fromEquirectangularTexture(renderer, texture);
@@ -48,6 +48,17 @@ const texture = loader.load(
 
 document.addEventListener('keydown', ({ keyCode }) => { controls[keyCode] = true });
 document.addEventListener('keyup', ({ keyCode }) => { controls[keyCode] = false });
+
+const listener = new THREE.AudioListener();
+camera.add( listener );
+const sound = new THREE.Audio( listener );
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load( '../assets/sounds/tree-city.mp3', function( buffer ) {
+	sound.setBuffer( buffer );
+	sound.setLoop( true );
+	sound.setVolume( 0.5 );
+	sound.play();
+});
 
 import * as PointerLockControls from 'PointerLockControls';
 const mouseControls = new PointerLockControls.PointerLockControls( camera, document.body );
@@ -67,6 +78,8 @@ startButton.addEventListener(
     false
 )
 
+let gravity = true;
+
 // ...
 function control() {
   if(controls[87]){ // w
@@ -81,12 +94,16 @@ function control() {
   if(controls[68]){ // d
     mouseControls.moveRight(player.speed);
   }
-  // if(controls[37]){ // la
-  //   camera.rotation.y -= player.turnSpeed;
-  // }
-  // if(controls[39]){ // ra
-  //   camera.rotation.y += player.turnSpeed;
-  // }
+  if(controls[13]){ // enter
+    if(gravity==true) {
+      player.gravity = 0;
+      gravity = false;
+    }
+    else {
+      player.gravity = .01;
+      gravity = true;
+    }
+  }
   if(controls[32]) { // space
     if(player.jumps) return false;
     player.jumps = true;
@@ -107,6 +124,7 @@ function ixMovementUpdate() {
 function update() {
   control();
   ixMovementUpdate();
+  moveToPlayer();
   // ixLightcubeAnimation();
 }
 
@@ -123,8 +141,8 @@ renderer.setAnimationLoop( function () {
 
 import { VOXLoader, VOXMesh } from '../node_modules/three/examples/jsm/loaders/VOXLoader.js';
 const loader1 = new VOXLoader();
-loadVox('../resources/knight.vox');
-loadVox('../resources/monu10.vox');
+loadVox('../assets/models/knight.vox');
+loadVox('../assets/models/monu10.vox');
 function loadVox(path) {
   loader1.load( path, function ( chunks ) {
     for ( let i = 0; i < chunks.length; i ++ ) {
@@ -143,43 +161,13 @@ let light2 = new THREE.AmbientLight("white", 0.35);
 light2.position.set(10, 200, 0);
 scene.add(light2);
 
-// let BoxGeometry1 = new THREE.BoxGeometry(1, 1, 1);
-// let BoxMaterial1 = new THREE.MeshBasicMaterial({ color: "yellow", wireframe: false });
-// let Box1 = new THREE.Mesh(BoxGeometry1, BoxMaterial1);
-
-// Box1.position.y = 3;
-// Box1.scale.x = Box1.scale.y = Box1.scale.z = .25;
-// scene.add(Box1);
-
-// let BoxGeometry2 = new THREE.BoxGeometry(1, 1, 1);
-// let BoxMaterial2 = new THREE.MeshPhongMaterial({ color: "white", wireframe: false });
-// let Box2 = new THREE.Mesh(BoxGeometry2, BoxMaterial2);
-
-// Box2.position.y = .75;
-// Box2.position.x = 0;
-// Box2.receiveShadow = true;
-// Box2.castShadow = true;
-
-// scene.add(Box2);
-
-// let PlaneGeometry1 = new THREE.PlaneGeometry(10, 10);
-// let PlaneMaterial1 = new THREE.MeshPhongMaterial({ color: "white", wireframe: false });
-// let Plane1 = new THREE.Mesh(PlaneGeometry1, PlaneMaterial1);
-
-// Plane1.rotation.x -= Math.PI / 2;
-// Plane1.scale.x = 3;
-// Plane1.scale.y = 3;
-// Plane1.receiveShadow = true;
-// scene.add(Plane1);
-
-// let light1 = new THREE.PointLight("white", .8);
-// light1.position.set(0, 3, 0);
-// light1.castShadow = true;
-// light1.shadow.camera.near = 2.5;
-// scene.add(light1);
-
-// function ixLightcubeAnimation() {
-//   let a = .01;
-//   Box1.rotation.x += a;
-//   Box1.rotation.y += a;
-// }
+let BoxGeometry1 = new THREE.BoxGeometry(1, 1, 1);
+let BoxMaterial1 = new THREE.MeshBasicMaterial({ color: "yellow", wireframe: false });
+let Box1 = new THREE.Mesh(BoxGeometry1, BoxMaterial1);
+Box1.scale.x = Box1.scale.y = Box1.scale.z = .25;
+function moveToPlayer() {
+  Box1.position.x = camera.position.x;
+  Box1.position.y = camera.position.y;
+  Box1.position.z = camera.position.z;
+}
+scene.add(Box1);

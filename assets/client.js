@@ -124,27 +124,28 @@ function ixMovementUpdate() {
 function update() {
   control();
   ixMovementUpdate();
-  moveToPlayer();
-  // ixLightcubeAnimation();
+  cameraLockToPlayerLoop();
 }
 
 function render() {
 	renderer.render(scene, camera);
 }
 
-renderer.setAnimationLoop( function () {
+function cameraLockToPlayerLoop() {
 
+}
+
+renderer.setAnimationLoop( function () {
 	update();
 	render();
-
 } );
 
 import { VOXLoader, VOXMesh } from '../node_modules/three/examples/jsm/loaders/VOXLoader.js';
-const loader1 = new VOXLoader();
+const VoxLoader = new VOXLoader();
 loadVox('../assets/models/knight.vox');
-loadVox('../assets/models/monu10.vox');
+//loadVox('../assets/models/monu10.vox');
 function loadVox(path) {
-  loader1.load( path, function ( chunks ) {
+  VoxLoader.load( path, function ( chunks ) {
     for ( let i = 0; i < chunks.length; i ++ ) {
       const chunk = chunks[ i ];
       const mesh = new VOXMesh( chunk );
@@ -158,16 +159,22 @@ function loadVox(path) {
 }
 
 let light2 = new THREE.AmbientLight("white", 0.35);
-light2.position.set(10, 200, 0);
+light2.position.set(0, 50, 0);
 scene.add(light2);
 
-let BoxGeometry1 = new THREE.BoxGeometry(1, 1, 1);
-let BoxMaterial1 = new THREE.MeshBasicMaterial({ color: "yellow", wireframe: false });
-let Box1 = new THREE.Mesh(BoxGeometry1, BoxMaterial1);
-Box1.scale.x = Box1.scale.y = Box1.scale.z = .25;
-function moveToPlayer() {
-  Box1.position.x = camera.position.x;
-  Box1.position.y = camera.position.y;
-  Box1.position.z = camera.position.z;
+import { FBXLoader } from '../node_modules/three/examples/jsm/loaders/FBXLoader.js';
+const FbxLoader = new FBXLoader();
+
+function loadFBX(path) {
+  loader.load(path, function ( object ) {
+    object.traverse( function ( child ) {
+      if ( child.isMesh ) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    } );
+    scene.add( object );
+  } );
 }
-scene.add(Box1);
+
+console.log(FbxLoader);

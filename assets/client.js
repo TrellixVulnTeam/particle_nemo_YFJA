@@ -156,8 +156,6 @@ scene.add(light2);
 
 import { FBXLoader } from '../node_modules/three/examples/jsm/loaders/FBXLoader.js';
 const FbxLoader = new FBXLoader();
-const FbxLoader2 = new FBXLoader();
-let AnimationMixer;
 
 let PlayerObject = null;
 loadFBX('../assets/models/player.fbx');
@@ -173,12 +171,6 @@ function loadFBX(path) {
     } );
     object.scale.multiplyScalar(0.01); 
     PlayerObject = object;
-
-    FbxLoader2.load(('../assets/animations/idle.fbx'), (anim) => {
-      AnimationMixer = new THREE.AnimationMixer(PlayerObject);
-      const idle = AnimationMixer.clipAction(FbxLoader2.animations[0]);
-      idle.play();
-    });
 
     scene.add(object);
   } );
@@ -198,6 +190,7 @@ scene.add(Plane1);
 function cameraLockToPlayerLoop() {
   if(PlayerObject==null) return;
   PlayerObject.position.set(camera.position.x, camera.position.y-(player.height-0.3), camera.position.z);
+  PlayerObject.rotation.y = camera.rotation.y;
 }
 
 renderer.setAnimationLoop( function () {

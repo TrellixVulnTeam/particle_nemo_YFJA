@@ -1,11 +1,10 @@
-import * as THREE from "../node_modules/three/build/three.module.js";
+import * as THREE from 'three';
 
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, .1, 1000);
 let renderer = new THREE.WebGLRenderer();
-var mouse = new THREE.Vector2();
 
-import { VRButton } from './vrbutton.js';
+import { VRButton } from '../assets/vrbutton.js';
 document.body.appendChild( VRButton.createButton( renderer ) );
 renderer.xr.enabled = true;
 
@@ -35,13 +34,6 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
 });
 
-document.addEventListener('mousemove', onDocumentMouseMove, false);
-function onDocumentMouseMove(event) {
-  event.preventDefault();
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-}
-
 camera.position.set(0, player.height, -5);
 camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
@@ -57,43 +49,44 @@ const texture = loader.load(
 document.addEventListener('keydown', ({ keyCode }) => { controls[keyCode] = true });
 document.addEventListener('keyup', ({ keyCode }) => { controls[keyCode] = false });
 
-// import { PointerLockControls } from 'https://unpkg.com/three@0.141.0/examples/jsm/controls/OrbitControls.js';
-// const mouseControls = new PointerLockControls.PointerLockControls( camera, document.body );
-// mouseControls.addEventListener( 'lock', function () {
-// 	menu.style.display = 'none';
-// } );
-// mouseControls.addEventListener( 'unlock', function () {
-// 	menu.style.display = 'block';
-// } );
-
-// import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
-
-// const controls1 = new OrbitControls( camera, renderer.domElement );
+import * as PointerLockControls from 'PointerLockControls';
+const mouseControls = new PointerLockControls.PointerLockControls( camera, document.body );
+const menuPanel = document.getElementById('menuPanel')
+mouseControls.addEventListener( 'lock', function () {
+	menuPanel.style.display = 'none';
+} );
+mouseControls.addEventListener( 'unlock', function () {
+	menuPanel.style.display = 'block';
+} );
+const startButton = document.getElementById('startButton')
+startButton.addEventListener(
+    'click',
+    function () {
+      mouseControls.lock()
+    },
+    false
+)
 
 // ...
 function control() {
   if(controls[87]){ // w
-    camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
-    camera.position.z -= -Math.cos(camera.rotation.y) * player.speed;
+    mouseControls.moveForward(player.speed);
   }
   if(controls[83]){ // s
-    camera.position.x += Math.sin(camera.rotation.y) * player.speed;
-    camera.position.z += -Math.cos(camera.rotation.y) * player.speed;
+    mouseControls.moveForward(-player.speed);
   }
   if(controls[65]){ // a
-    camera.position.x += Math.sin(camera.rotation.y + Math.PI / 2) * player.speed;
-    camera.position.z += -Math.cos(camera.rotation.y + Math.PI / 2) * player.speed;
+    mouseControls.moveRight(-player.speed);
   }
   if(controls[68]){ // d
-    camera.position.x += Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
-    camera.position.z += -Math.cos(camera.rotation.y - Math.PI / 2) * player.speed;
+    mouseControls.moveRight(player.speed);
   }
-  if(controls[37]){ // la
-    camera.rotation.y -= player.turnSpeed;
-  }
-  if(controls[39]){ // ra
-    camera.rotation.y += player.turnSpeed;
-  }
+  // if(controls[37]){ // la
+  //   camera.rotation.y -= player.turnSpeed;
+  // }
+  // if(controls[39]){ // ra
+  //   camera.rotation.y += player.turnSpeed;
+  // }
   if(controls[32]) { // space
     if(player.jumps) return false;
     player.jumps = true;

@@ -10,7 +10,7 @@ renderer.xr.enabled = true;
 
 let controls = {};
 let player = {
-  height: .5,
+  height: 2,
   turnSpeed: .05,
   speed: .1,
   jumpHeight: .2,
@@ -107,6 +107,7 @@ function control() {
   if(controls[32]) { // space
     if(player.jumps) return false;
     player.jumps = true;
+    if(player.gravity==0) player.jumps=false;
     player.velocity = -player.jumpHeight;
   }
 }
@@ -131,15 +132,6 @@ function render() {
 	renderer.render(scene, camera);
 }
 
-function cameraLockToPlayerLoop() {
-
-}
-
-renderer.setAnimationLoop( function () {
-	update();
-	render();
-} );
-
 import { VOXLoader, VOXMesh } from '../node_modules/three/examples/jsm/loaders/VOXLoader.js';
 const VoxLoader = new VOXLoader();
 loadVox('../assets/models/knight.vox');
@@ -158,23 +150,46 @@ function loadVox(path) {
   } );
 }
 
-let light2 = new THREE.AmbientLight("white", 0.35);
+let light2 = new THREE.AmbientLight("white", .69);
 light2.position.set(0, 50, 0);
 scene.add(light2);
 
 import { FBXLoader } from '../node_modules/three/examples/jsm/loaders/FBXLoader.js';
 const FbxLoader = new FBXLoader();
 
+let PlayerObject = null;
+loadFBX('../assets/models/player.fbx');
+
 function loadFBX(path) {
-  loader.load(path, function ( object ) {
+  FbxLoader.load(path, function ( object ) {
     object.traverse( function ( child ) {
       if ( child.isMesh ) {
         child.castShadow = true;
         child.receiveShadow = true;
       }
     } );
-    scene.add( object );
+    object.scale.multiplyScalar(0.01); 
+    PlayerObject = object;
+    scene.add(object);
   } );
 }
 
-console.log(FbxLoader);
+let PlaneGeometry1 = new THREE.PlaneGeometry(10, 10);
+let PlaneMaterial1 = new THREE.MeshPhongMaterial({ color: "white", wireframe: false });
+let Plane1 = new THREE.Mesh(PlaneGeometry1, PlaneMaterial1);
+
+Plane1.rotation.x -= Math.PI / 2;
+Plane1.scale.x = 3;
+Plane1.scale.y = 3;
+Plane1.receiveShadow = true;
+scene.add(Plane1);
+
+function cameraLockToPlayerLoop() {
+  if(PlayerObject==null) return;
+  PlayerObject.position.set(camera.position.x, camera.position.y-(player.height-0.3), camera.position.z);
+}
+
+renderer.setAnimationLoop( function () {
+	update();
+	render();
+} );

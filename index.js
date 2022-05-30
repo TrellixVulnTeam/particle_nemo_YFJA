@@ -85,7 +85,6 @@ walk(threeFolder, function(err, results) {
     }
     newPath = newPath.slice(0, -1)
     app.get(newPath, (req, res) => {
-      console.log(absolutePath);
       res.sendFile(absolutePath);
     });
   }
@@ -93,7 +92,6 @@ walk(threeFolder, function(err, results) {
 });
 
 app.get('/', (req, res) => {
-    console.log(appDir.concat("\\index.html"));
     res.sendFile(appDir.concat("\\index.html"));
 });
 

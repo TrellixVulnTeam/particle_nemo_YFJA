@@ -170,8 +170,14 @@ function loadFBX(path) {
       }
     } );
     object.scale.multiplyScalar(0.01); 
-    PlayerObject = object;
 
+    const anim = new FBXLoader();
+    anim.load('../assets/animations/idle.fbx', (anim) => {
+      const m = new THREE.AnimationMixer(object);
+      const idle = m.clipAction(anim.animations[0]);
+      idle.play();
+    });
+    PlayerObject = object;
     scene.add(object);
   } );
 
@@ -190,7 +196,6 @@ scene.add(Plane1);
 function cameraLockToPlayerLoop() {
   if(PlayerObject==null) return;
   PlayerObject.position.set(camera.position.x, camera.position.y-(player.height-0.3), camera.position.z);
-  PlayerObject.rotation.y = camera.rotation.y;
 }
 
 renderer.setAnimationLoop( function () {

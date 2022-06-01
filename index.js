@@ -95,6 +95,19 @@ app.get('/', (req, res) => {
     res.sendFile(appDir.concat("\\index.html"));
 });
 
+app.get('/getServers', (req, res) => {
+  
+});
+app.post('/serverStart', (req, res) => {
+  
+});
+app.post('/serverStop', (req, res) => {
+  
+});
+app.post('/updatePlayers', (req, res) => {
+  
+});
+
 app.listen(port, () => {
     console.log(`Particle Nemo web server listening on port ${port}`);
 });
